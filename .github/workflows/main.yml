@@ -7,46 +7,44 @@ on:
 
 jobs:
   build-and-deploy:
-    runs-on: self-hosted
+    runs-on: self-hosted  
     steps:
-      - name: Deploy to kubernetes
-        runs: |
-        $yamlContect = @"
-        apiVersion: apps/v1
-        kind: Deployment
-        metadata:
-          name: eshop-web-deployment
-        spec:
-          replicas: 3
-          selector:
-            matchLabels:
-              app: eshop-web
-          template:
-            metadata:
-              labels:
+      - name: Deploy to Kubernetes
+        run: |
+          $yamlContent = @"
+          apiVersion: apps/v1
+          kind: Deployment
+          metadata:
+            name: eshop-web-deployment
+          spec:
+            replicas: 3
+            selector:
+              matchLabels:
                 app: eshop-web
-            spec:
-              containers:
-              - name: eshop-web-containers
-                image: wutzzplw/eshopweb-k8s:1.0
-                ports:
-                - containerPort: 3000
-
-        ---
-
-        apiVersion: v1
-        kind: Service
-        metadata:
-          name: eshop-web-service
-        spec:
-          selector:
-            app: eshop-web
-          ports:
+            template:
+              metadata:
+                labels:
+                  app: eshop-web
+              spec:
+                containers:
+                - name: eshop-web-containers
+                  image: wutzzplw/eshopweb-k8s:1.0
+                  ports:
+                  - containerPort: 3000
+          ---
+          apiVersion: v1
+          kind: Service
+          metadata:
+            name: eshop-web-service
+          spec:
+            selector:
+              app: eshop-web
+            ports:
             - protocol: TCP
               port: 80
               targetPort: 3000
-          type: LoadBalancer
-        "@
+            type: LoadBalancer
+          "@
 
-        $yamlContent | Out-File -FilePath deployment.yaml
-        kubectl apply -f deployment.yaml
+          $yamlContent | Out-File -FilePath deployment.yaml
+          kubectl apply -f deployment.yaml
